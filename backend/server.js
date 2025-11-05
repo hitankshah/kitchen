@@ -14,7 +14,15 @@ const port = process.env.PORT || 4000;
 
 // middlewares
 app.use(express.json())
-app.use(cors())
+app.use(cors({
+    origin: [
+        'https://kitchen-peach.vercel.app',
+        'https://kitchen-v2jj.vercel.app',
+        'http://localhost:5173',
+        'http://localhost:5174'
+    ],
+    credentials: true
+}))
 
 // Verify Supabase connection
 console.log('✅ Supabase client initialized');
