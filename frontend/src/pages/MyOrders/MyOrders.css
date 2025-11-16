@@ -35,6 +35,15 @@
     cursor: pointer;
     color: #454545;
 }
+.no-orders {
+    text-align: center;
+    padding: 50px 20px;
+    color: #666;
+    font-size: 16px;
+}
+.no-orders p {
+    margin: 0;
+}
 @media (max-width:900px) {
     .my-orders-order{
         grid-template-columns: 1fr 2fr 1fr;

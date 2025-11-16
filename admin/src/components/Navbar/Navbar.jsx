@@ -13,7 +13,7 @@ const Navbar = () => {
     try {
       await signOut();
       toast.success('Logged out successfully');
-      navigate('/login');
+      navigate('/login', { replace: true });
     } catch (error) {
       console.error('Logout error:', error);
       toast.error('Failed to logout');

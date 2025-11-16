@@ -20,8 +20,8 @@ const Navbar = ({ setShowLogin }) => {
     <div className='navbar'>
       <Link to='/' className='logo-text'>Bhojanalay Cloud Kitchen</Link>
       <ul className="navbar-menu">
-        <Link to="/" onClick={() => setMenu("home")} className={`${menu === "home" ? "active" : ""}`}>Home</Link>
-        <a href='#explore-menu' onClick={() => setMenu("menu")} className={`${menu === "menu" ? "active" : ""}`}>Menu</a>
+        <li><Link to="/" onClick={() => setMenu("home")} className={menu === "home" ? "active" : ""}>Home</Link></li>
+        <li><a href='#food-display' onClick={() => setMenu("menu")} className={menu === "menu" ? "active" : ""}>Menu</a></li>
       </ul>
       <div className="navbar-right">
         <img src={assets.search_icon} alt="" />
@@ -33,6 +33,8 @@ const Navbar = ({ setShowLogin }) => {
           : <div className='navbar-profile'>
             <img src={assets.profile_icon} alt="" />
             <ul className='navbar-profile-dropdown'>
+              <li onClick={()=>navigate('/profile')}> <img src={assets.profile_icon} alt="" /> <p>Profile</p></li>
+              <hr />
               <li onClick={()=>navigate('/myorders')}> <img src={assets.bag_icon} alt="" /> <p>Orders</p></li>
               <hr />
               <li onClick={logout}> <img src={assets.logout_icon} alt="" /> <p>Logout</p></li> 

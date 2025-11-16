@@ -144,8 +144,32 @@ export const AuthProvider = ({ children }) => {
       throw new Error(configError || SUPABASE_CONFIG_ERROR);
     }
 
-    const { error } = await client.auth.signOut();
+    // Request Supabase to end the current session (local + other devices)
+    const { error } = await client.auth.signOut({ scope: 'global' });
     if (error) throw error;
+
+    // Extra safety: remove any cached session remnants
+    try {
+      const authClient = client.auth;
+      const storage = authClient?.storage;
+      const storageKey = authClient?.storageKey;
+
+      if (storage && storageKey && typeof storage.removeItem === 'function') {
+        storage.removeItem(storageKey);
+        storage.removeItem(`${storageKey}-persist`);
+      }
+
+      if (typeof window !== 'undefined') {
+        window.localStorage.removeItem('supabase.auth.token.admin');
+        window.localStorage.removeItem('supabase.pkce.code_verifier');
+      }
+    } catch (storageError) {
+      console.warn('Failed to clear auth storage:', storageError);
+    }
+
+    setUser(null);
+    setUserProfile(null);
+    setIsAdmin(false);
   };
 
   const createAdmin = async (email, password, fullName) => {

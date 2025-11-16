@@ -96,4 +96,40 @@ const registerUser = async (req,res) => {
     }
 }
 
-export {loginUser, registerUser}
+// Update user profile
+const updateProfile = async (req, res) => {
+    try {
+        const { full_name, phone, address } = req.body;
+        const userId = req.userId; // From auth middleware
+
+        // Update user profile in users table
+        const { data, error } = await supabase
+            .from('users')
+            .update({
+                full_name,
+                phone,
+                address,
+                updated_at: new Date().toISOString()
+            })
+            .eq('id', userId)
+            .select()
+            .single();
+
+        if (error) {
+            console.log('Profile update error:', error);
+            return res.json({ success: false, message: error.message || "Failed to update profile" });
+        }
+
+        res.json({
+            success: true,
+            message: "Profile updated successfully",
+            user: data
+        });
+
+    } catch (error) {
+        console.log('Error updating profile:', error);
+        res.json({ success: false, message: "Error updating profile" });
+    }
+};
+
+export {loginUser, registerUser, updateProfile}

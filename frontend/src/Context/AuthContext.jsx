@@ -318,7 +318,8 @@ export const AuthProvider = ({ children }) => {
       signOut,
       continueAsGuest,
       resendVerification,
-      resetPassword
+      resetPassword,
+      fetchProfile
     }}>
       {children}
     </AuthContext.Provider>

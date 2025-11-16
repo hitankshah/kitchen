@@ -13,6 +13,7 @@ const authMiddleware = async (req, res, next) => {
             return res.json({success:false,message:'Invalid token or session expired'});
         }
 
+        req.userId = user.id;
         req.body.userId = user.id;
         req.user = user;
         next();
