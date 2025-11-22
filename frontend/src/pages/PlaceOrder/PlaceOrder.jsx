@@ -47,16 +47,37 @@ const PlaceOrder = () => {
             items: orderItems,
             amount: getTotalCartAmount() + deliveryCharge,
         }
-        if (payment === "stripe") {
-            let response = await axios.post(url + "/api/order/place", orderData, { headers: { token } });
-            if (response.data.success) {
-                const { session_url } = response.data;
-                window.location.replace(session_url);
+            if (payment === "foxy") {
+                // send paymentMethod so backend prepares Foxy fields
+                orderData.paymentMethod = 'foxy';
+                let response = await axios.post(url + "/api/order/place", orderData, { headers: { token } });
+                if (response.data.success && response.data.redirect) {
+                    const { method, url: redirectUrl, fields } = response.data.redirect;
+                    if (method === 'post') {
+                        // build form and submit to Foxy
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = redirectUrl;
+                        form.style.display = 'none';
+
+                        Object.keys(fields).forEach((key) => {
+                            const input = document.createElement('input');
+                            input.type = 'hidden';
+                            input.name = key;
+                            input.value = String(fields[key]);
+                            form.appendChild(input);
+                        });
+
+                        document.body.appendChild(form);
+                        form.submit();
+                    } else if (redirectUrl) {
+                        window.location.href = redirectUrl;
+                    }
+                }
+                else {
+                    toast.error("Something Went Wrong")
+                }
             }
-            else {
-                toast.error("Something Went Wrong")
-            }
-        }
         else{
             let response = await axios.post(url + "/api/order/placecod", orderData, { headers: { token } });
             if (response.data.success) {
@@ -118,9 +139,9 @@ const PlaceOrder = () => {
                         <img src={payment === "cod" ? assets.checked : assets.un_checked} alt="" />
                         <p>COD ( Cash on delivery )</p>
                     </div>
-                    <div onClick={() => setPayment("stripe")} className="payment-option">
-                        <img src={payment === "stripe" ? assets.checked : assets.un_checked} alt="" />
-                        <p>Stripe ( Credit / Debit )</p>
+                    <div onClick={() => setPayment("foxy")} className="payment-option">
+                        <img src={payment === "foxy" ? assets.checked : assets.un_checked} alt="" />
+                        <p>Foxy ( Card / Wallet / Hosted Checkout )</p>
                     </div>
                 </div>
                 <button className='place-order-submit' type='submit'>{payment==="cod"?"Place Order":"Proceed To Payment"}</button>
