@@ -14,7 +14,7 @@ const Category = () => {
   const mealMap = {
     "Morning": ["Sandwich", "Breakfast"],
     "Lunch": ["Salad", "Rolls", "Pure Veg", "Main Course"],
-    "Dinner": ["Pasta", "Noodles", "Pizza", "Burger"],
+    "Every time available item": ["Pasta", "Noodles", "Pizza", "Burger"],
     "Dessert": ["Deserts", "Cake", "Ice Cream"],
     "Beverages": ["Beverages", "Drinks", "Cold Drinks"]
   };
@@ -50,4 +50,4 @@ const Category = () => {
   )
 }
 
-export default Category
+export default Category ;

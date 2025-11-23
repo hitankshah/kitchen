@@ -13,7 +13,7 @@ const FoodDisplay = ({category}) => {
   const mealMap = {
     "Morning": ["Sandwich", "Breakfast"],
     "Lunch": ["Salad", "Rolls", "Pure Veg", "Main Course"],
-    "Dinner": ["Pasta", "Noodles", "Pizza", "Burger"],
+    "Every time available item": ["Pasta", "Noodles", "Pizza", "Burger"],
     "Dessert": ["Deserts", "Cake", "Ice Cream"],
     "Beverages": ["Beverages", "Drinks", "Cold Drinks"]
   };
@@ -23,7 +23,7 @@ const FoodDisplay = ({category}) => {
   let currentMeal = "";
   if (hour >= 5 && hour < 11) currentMeal = "Morning";
   else if (hour >= 11 && hour < 17) currentMeal = "Lunch";
-  else currentMeal = "Dinner"; // 5pm to 5am
+  else currentMeal = "Every time available item"; // 5pm to 5am
 
   // If a specific category is selected (e.g. from ExploreMenu), show that. 
   // Otherwise show the Meal Type sections.
@@ -67,7 +67,7 @@ const FoodDisplay = ({category}) => {
                         </div>
                         {hasMore && (
                             <button className="view-all-btn" onClick={() => navigate(`/category/${mealType}`)}>
-                                View All
+                                View all
                             </button>
                         )}
                     </div>
@@ -93,7 +93,7 @@ const FoodDisplay = ({category}) => {
                     <div className="category-title-row">
                         <h2>{cat}</h2>
                         <button className="view-all-btn" onClick={() => navigate(`/category/${cat}`)}>
-                            View All
+                            View all
                         </button>
                     </div>
                     <div className='food-display-list'>
