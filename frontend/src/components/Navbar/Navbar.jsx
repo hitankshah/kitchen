@@ -3,17 +3,25 @@ import './Navbar.css'
 import { assets } from '../../assets/assets'
 import { Link, useNavigate } from 'react-router-dom'
 import { StoreContext } from '../../Context/StoreContext'
+import { useAuth } from '../../Context/AuthContext'
 
 const Navbar = ({ setShowLogin }) => {
 
   const [menu, setMenu] = useState("home");
-  const { getTotalCartAmount, token ,setToken } = useContext(StoreContext);
+  const { getTotalCartAmount, token, setToken } = useContext(StoreContext);
+  const { user, userProfile, signOut } = useAuth();
   const navigate = useNavigate();
 
-  const logout = () => {
-    localStorage.removeItem("token");
-    setToken("");
-    navigate('/')
+  const logout = async () => {
+    try {
+      await signOut();
+      localStorage.removeItem("token");
+      localStorage.removeItem("supabase_authenticated");
+      setToken("");
+      navigate('/')
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
   }
 
   return (
@@ -29,10 +37,15 @@ const Navbar = ({ setShowLogin }) => {
           <img src={assets.basket_icon} alt="" />
           <div className={getTotalCartAmount() > 0 ? "dot" : ""}></div>
         </Link>
-        {!token ? <button onClick={() => setShowLogin(true)}>sign in</button>
+        {!token && !user ? <button onClick={() => setShowLogin(true)}>sign in</button>
           : <div className='navbar-profile'>
             <img src={assets.profile_icon} alt="" />
             <ul className='navbar-profile-dropdown'>
+              <li className='user-info-header'>
+                <p style={{ margin: 0, fontWeight: "600" }}>{userProfile?.full_name || user?.email || 'User'}</p>
+                <p style={{ margin: 0, fontSize: "12px", color: "#666" }}>{userProfile?.email || user?.email}</p>
+              </li>
+              <hr />
               <li onClick={()=>navigate('/profile')}> <img src={assets.profile_icon} alt="" /> <p>Profile</p></li>
               <hr />
               <li onClick={()=>navigate('/myorders')}> <img src={assets.bag_icon} alt="" /> <p>Orders</p></li>

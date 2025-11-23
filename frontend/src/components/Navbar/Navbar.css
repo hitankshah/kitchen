@@ -183,6 +183,22 @@
     padding-left: 22px;
 }
 
+.user-info-header {
+    cursor: default !important;
+    background: #f8f9fa !important;
+    padding: 15px 18px !important;
+    border-bottom: 1px solid #e0e0e0;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 4px !important;
+}
+
+.user-info-header:hover {
+    color: inherit !important;
+    background: #f8f9fa !important;
+    padding-left: 18px !important;
+}
+
 .navbar-profile:hover .navbar-profile-dropdown {
     display: flex;
     flex-direction: column;

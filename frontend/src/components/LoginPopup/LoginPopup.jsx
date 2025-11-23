@@ -1,14 +1,15 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
 import './LoginPopup.css'
 import { assets } from '../../assets/assets'
 import { StoreContext } from '../../Context/StoreContext'
 import { useAuth } from '../../Context/AuthContext'
+import { supabase } from '../../lib/supabase'
 import { toast } from 'react-toastify'
 
 const LoginPopup = ({ setShowLogin }) => {
 
     const { setToken, url, loadCartData } = useContext(StoreContext)
-    const { signUp, signIn, resendVerification, resetPassword } = useAuth()
+    const { signUp, signIn, resendVerification, resetPassword, user, userProfile } = useAuth()
     
     const [currState, setCurrState] = useState("Sign Up");
     const [showVerification, setShowVerification] = useState(false);
@@ -21,6 +22,25 @@ const LoginPopup = ({ setShowLogin }) => {
         password: "",
         phone: ""
     })
+
+    // Sync session token when user logs in successfully
+    useEffect(() => {
+        const syncToken = async () => {
+            if (user) {
+                try {
+                    const { data: { session } } = await supabase.auth.getSession();
+                    if (session?.access_token) {
+                        setToken(session.access_token);
+                        localStorage.setItem("token", session.access_token);
+                        localStorage.setItem("supabase_authenticated", "true");
+                    }
+                } catch (error) {
+                    console.error("Token sync error:", error);
+                }
+            }
+        };
+        syncToken();
+    }, [user, setToken]);
 
     const onChangeHandler = (event) => {
         const name = event.target.name
@@ -36,7 +56,12 @@ const LoginPopup = ({ setShowLogin }) => {
             if (currState === "Login") {
                 await signIn(data.email, data.password)
                 toast.success("Login successful!")
-                // Store token in localStorage for backward compatibility
+                // Get the session token and sync it
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session?.access_token) {
+                    setToken(session.access_token);
+                    localStorage.setItem("token", session.access_token);
+                }
                 localStorage.setItem("supabase_authenticated", "true")
                 setShowLogin(false)
             } else {
