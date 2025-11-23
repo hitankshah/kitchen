@@ -37,13 +37,17 @@ export const validateFullName = (fullName) => {
 
 // Phone validation
 export const validatePhone = (phone) => {
-  if (phone.length < 10) {
+  // Remove all non-digit characters to check length
+  const digits = phone.replace(/\D/g, '');
+
+  if (digits.length < 10) {
     return { valid: false, message: 'Phone number must be at least 10 digits' };
   }
-  if (phone.length > 15) {
+  if (digits.length > 15) {
     return { valid: false, message: 'Phone number too long' };
   }
-  if (!/^\+?[\d\s\-\(\)]+$/.test(phone)) {
+  // Allow + at start, and digits, spaces, dashes, dots, parentheses
+  if (!/^[\+]?[\d\s\-\(\)\.]+$/.test(phone)) {
     return { valid: false, message: 'Invalid phone number format' };
   }
   return { valid: true };
