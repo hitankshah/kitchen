@@ -1,16 +1,16 @@
 import { createContext, useEffect, useState } from "react";
-import { food_list, menu_list } from "../assets/assets";
+import { food_list as food_list_assets, menu_list } from "../assets/assets";
 import axios from "axios";
 export const StoreContext = createContext(null);
 
 const StoreContextProvider = (props) => {
 
     const url = "https://kitchen-agpd.onrender.com"
-    const [food_list, setFoodList] = useState([]);
+    const [food_list, setFoodList] = useState(food_list_assets); // Initialize with static data
     const [cartItems, setCartItems] = useState({});
     const [token, setToken] = useState("")
     const currency = "$";
-    const deliveryCharge = 5;
+    const deliveryCharge = 0;
 
     const addToCart = async (itemId) => {
         if (!cartItems[itemId]) {

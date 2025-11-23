@@ -1,14 +1,105 @@
 .food-display{
     margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 50px;
 }
+
+.category-section {
+    width: 100%;
+}
+
+.category-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 10px;
+}
+
 .food-display h2{
     font-size: max(2vw,24px);
-    font-weight: 600;
+    font-weight: 700;
+    position: relative;
+    display: inline-block;
+    margin: 0;
 }
+
+/* Underline style from screenshot */
+.food-display h2::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -12px;
+    width: 60px;
+    height: 4px;
+    background-color: #FF4C24; /* App orange */
+    border-radius: 2px;
+}
+
+.view-all-btn {
+    background-color: transparent;
+    border: 1px solid #FF4C24;
+    color: #FF4C24;
+    padding: 8px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s;
+}
+
+.view-all-btn:hover {
+    background-color: #FF4C24;
+    color: white;
+}
+
 .food-display-list{
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    margin-top: 30px;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
     gap: 30px;
-    row-gap: 50px;
+    row-gap: 40px;
+}
+
+@media (max-width: 600px) {
+    .food-display-list {
+        grid-template-columns: 1fr; /* Single column on mobile */
+    }
+    .food-item {
+        height: auto; /* Allow flexible height on mobile if needed */
+        min-height: 160px;
+    }
+    .category-title-row {
+        flex-direction: row;
+        align-items: center;
+    }
+    .food-display h2 {
+        font-size: 20px;
+    }
+    .view-all-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+}
+
+.title-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.now-serving-badge {
+    background-color: #4CAF50;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
 }

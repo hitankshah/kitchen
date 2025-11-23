@@ -57,35 +57,36 @@ const Navbar = ({ setShowLogin }) => {
 
   return (
     <div className='navbar'>
-      <Link to='/' className='logo-text'>Bhojanalay Cloud Kitchen</Link>
-      <ul className="navbar-menu">
-        <li><Link to="/" onClick={() => setMenu("home")} className={menu === "home" ? "active" : ""}>Home</Link></li>
-        <li><a href='#food-display' onClick={() => setMenu("menu")} className={menu === "menu" ? "active" : ""}>Menu</a></li>
-      </ul>
-      <div className="navbar-right">
-        <img src={assets.search_icon} alt="" />
-        <Link to='/cart' className='navbar-search-icon'>
-          <img src={assets.basket_icon} alt="" />
-          <div className={getTotalCartAmount() > 0 ? "dot" : ""}></div>
-        </Link>
-        {!token && !user && !localToken ? <button onClick={() => setShowLogin(true)}>sign in</button>
-          : <div className='navbar-profile'>
-            <img src={assets.profile_icon} alt="" />
-            <ul className='navbar-profile-dropdown'>
-              <li className='user-info-header'>
-                <p style={{ margin: 0, fontWeight: "600" }}>{userProfile?.full_name || user?.email || 'User'}</p>
-                <p style={{ margin: 0, fontSize: "12px", color: "#666" }}>{userProfile?.email || user?.email}</p>
-              </li>
-              <hr />
-              <li onClick={()=>navigate('/profile')}> <img src={assets.profile_icon} alt="" /> <p>Profile</p></li>
-              <hr />
-              <li onClick={()=>navigate('/myorders')}> <img src={assets.bag_icon} alt="" /> <p>Orders</p></li>
-              <hr />
-              <li onClick={logout}> <img src={assets.logout_icon} alt="" /> <p>Logout</p></li> 
-            </ul>
-          </div>
-        }
-
+      <div className="navbar-content">
+        <Link to='/' className='logo-text'>Bhojanalay Cloud Kitchen</Link>
+        <ul className="navbar-menu">
+          <li><Link to="/" onClick={() => setMenu("home")} className={menu === "home" ? "active" : ""}>Home</Link></li>
+          <li><a href='#food-display' onClick={() => setMenu("menu")} className={menu === "menu" ? "active" : ""}>Menu</a></li>
+        </ul>
+        <div className="navbar-right">
+          <img src={assets.search_icon} alt="" />
+          <Link to='/cart' className='navbar-search-icon'>
+            <img src={assets.basket_icon} alt="" />
+            <div className={getTotalCartAmount() > 0 ? "dot" : ""}></div>
+          </Link>
+          {!token && !user && !localToken ? <button onClick={() => setShowLogin(true)}>sign in</button>
+            : <div className='navbar-profile'>
+              <img src={assets.profile_icon} alt="" />
+              <ul className='navbar-profile-dropdown'>
+                <li className='user-info-header'>
+                  <p style={{ margin: 0, fontWeight: "600" }}>{userProfile?.full_name || user?.email || 'User'}</p>
+                  <p style={{ margin: 0, fontSize: "12px", color: "#666" }}>{userProfile?.email || user?.email}</p>
+                </li>
+                <hr />
+                <li onClick={()=>navigate('/profile')}> <img src={assets.profile_icon} alt="" /> <p>Profile</p></li>
+                <hr />
+                <li onClick={()=>navigate('/myorders')}> <img src={assets.bag_icon} alt="" /> <p>Orders</p></li>
+                <hr />
+                <li onClick={logout}> <img src={assets.logout_icon} alt="" /> <p>Logout</p></li> 
+              </ul>
+            </div>
+          }
+        </div>
       </div>
     </div>
   )

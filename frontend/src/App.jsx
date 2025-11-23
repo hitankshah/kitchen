@@ -7,6 +7,7 @@ import LoginPopup from './components/LoginPopup/LoginPopup'
 import PlaceOrder from './pages/PlaceOrder/PlaceOrder'
 import MyOrders from './pages/MyOrders/MyOrders'
 import Profile from './pages/Profile/Profile'
+import Category from './pages/Category/Category'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Verify from './pages/Verify/Verify'
@@ -30,6 +31,7 @@ const App = () => {
             <Route path='/myorders' element={<MyOrders />} />
             <Route path='/profile' element={<Profile />} />
             <Route path='/verify' element={<Verify />} />
+            <Route path='/category/:categoryName' element={<Category />} />
           </Routes>
         </div>
       </>

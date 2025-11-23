@@ -2,7 +2,7 @@ import { supabase } from "../config/supabase.js";
 
 //config variables
 const currency = "inr";
-const deliveryCharge = 50;
+const deliveryCharge = 0;
 const frontend_URL = 'https://kitchen-peach.vercel.app';
 
 // Placing User Order for Frontend using Foxy hosted checkout
@@ -63,10 +63,10 @@ const placeOrder = async (req, res) => {
             });
 
             // Add delivery as an additional item
-            const deliveryIndex = req.body.items.length + 1;
-            fields[`item_name_${deliveryIndex}`] = 'Delivery Charge';
-            fields[`item_price_${deliveryIndex}`] = deliveryCharge;
-            fields[`item_quantity_${deliveryIndex}`] = 1;
+            // const deliveryIndex = req.body.items.length + 1;
+            // fields[`item_name_${deliveryIndex}`] = 'Delivery Charge';
+            // fields[`item_price_${deliveryIndex}`] = 0;
+            // fields[`item_quantity_${deliveryIndex}`] = 1;
 
             // Standard Foxy fields - merchant should configure store URL in env
             fields['order_id'] = orderData.id;
