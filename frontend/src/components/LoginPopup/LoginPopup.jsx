@@ -55,15 +55,38 @@ const LoginPopup = ({ setShowLogin }) => {
         try {
             if (currState === "Login") {
                 await signIn(data.email, data.password)
-                toast.success("Login successful!")
+                
+                // Wait a moment for Supabase to update session
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
                 // Get the session token and sync it
                 const { data: { session } } = await supabase.auth.getSession();
                 if (session?.access_token) {
                     setToken(session.access_token);
                     localStorage.setItem("token", session.access_token);
+                    localStorage.setItem("supabase_authenticated", "true");
+                    console.log("✅ Token synced:", session.access_token.substring(0, 20) + "...");
+                } else {
+                    console.warn("⚠️ No session token found");
                 }
-                localStorage.setItem("supabase_authenticated", "true")
+                
+                toast.success("Login successful!")
+                
+                // Wait for React to batch and apply all state updates
+                await new Promise(resolve => {
+                    setTimeout(() => {
+                        // Force browser to complete a render cycle
+                        requestAnimationFrame(() => {
+                            resolve();
+                        });
+                    }, 1000);
+                });
+                
                 setShowLogin(false)
+                
+                // Reset form
+                setData({ name: "", email: "", password: "", phone: "" })
+                setCurrState("Sign Up")
             } else {
                 // Sign Up
                 if (!data.phone) {
@@ -76,6 +99,7 @@ const LoginPopup = ({ setShowLogin }) => {
                 setShowVerification(true)
             }
         } catch (error) {
+            console.error("Login error:", error);
             toast.error(error.message || "An error occurred")
         } finally {
             setLoading(false)
