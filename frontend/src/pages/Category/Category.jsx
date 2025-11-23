@@ -14,7 +14,7 @@ const Category = () => {
   const mealMap = {
     "Morning": ["Sandwich", "Breakfast"],
     "Lunch": ["Salad", "Rolls", "Pure Veg", "Main Course"],
-    "Every time available item": ["Pasta", "Noodles", "Pizza", "Burger"],
+    "Any Time Available Item": ["Pasta", "Noodles", "Pizza", "Burger"],
     "Dessert": ["Deserts", "Cake", "Ice Cream"],
     "Beverages": ["Beverages", "Drinks", "Cold Drinks"]
   };
