@@ -6,15 +6,37 @@ import { useNavigate } from 'react-router-dom'
 
 const FoodDisplay = ({category}) => {
 
-  const {food_list} = useContext(StoreContext);
+  const {food_list, loading, menu_list} = useContext(StoreContext);
   const navigate = useNavigate();
 
-  // Mapping for Meal Types
+  // Show loading state
+  if (loading) {
+    return (
+      <div className='food-display' id='food-display'>
+        <p style={{ textAlign: 'center', padding: '50px', fontSize: '16px', color: '#999' }}>
+          Loading menu items...
+        </p>
+      </div>
+    );
+  }
+
+  // Show no data message
+  if (!food_list || food_list.length === 0) {
+    return (
+      <div className='food-display' id='food-display'>
+        <p style={{ textAlign: 'center', padding: '50px', fontSize: '16px', color: '#999' }}>
+          No items available. Please check back later.
+        </p>
+      </div>
+    );
+  }
+
+  // Mapping for Meal Types (must match database categories)
   const mealMap = {
-    "Morning": ["Sandwich", "Breakfast"],
-    "Lunch": ["Salad", "Rolls", "Pure Veg", "Main Course"],
-    "Any Time Available Item": ["Pasta", "Noodles", "Pizza", "Burger"],
-    "Dessert": ["Deserts", "Cake", "Ice Cream"],
+    "Morning": ["Sandwich", "breakfast"],
+    "Lunch": ["Salad", "Rolls", "Pure Veg", "Main Course", "all"],
+    "Any Time Available Item": ["Pasta", "Noodles", "Pizza", "Burger", "dinner"],
+    "Dessert": ["Deserts", "Ice Cream", "Cake"],
     "Beverages": ["Beverages", "Drinks", "Cold Drinks"]
   };
 
@@ -25,9 +47,9 @@ const FoodDisplay = ({category}) => {
   else if (hour >= 11 && hour < 17) currentMeal = "Lunch";
   else currentMeal = "Any Time Available Item"; // 5pm to 5am
 
-  // If a specific category is selected (e.g. from ExploreMenu), show that. 
-  // Otherwise show the Meal Type sections.
-  const isSpecificCategory = category !== "All" && category !== "Any Time Available Item";
+  // If category is "All", show all meal sections. Otherwise show specific category.
+  const isShowAllMeals = category === "All";
+  const isSpecificCategory = category !== "All" && !Object.keys(mealMap).includes(category);
 
   // Collect all categories used in mealMap
   const mappedCategories = Object.values(mealMap).flat();
@@ -36,7 +58,7 @@ const FoodDisplay = ({category}) => {
     <div className='food-display' id='food-display'>
       
       {isSpecificCategory ? (
-        // Original logic for specific category selection
+        // Single specific category view
         <div className="category-section">
             <h2>{category}</h2>
             <div className='food-display-list'>
@@ -45,7 +67,7 @@ const FoodDisplay = ({category}) => {
                 })}
             </div>
         </div>
-      ) : (
+      ) : isShowAllMeals || Object.keys(mealMap).includes(category) ? (
         <>
         {/* Meal Type Sections */}
         {Object.entries(mealMap).map(([mealType, categories]) => {
@@ -65,11 +87,9 @@ const FoodDisplay = ({category}) => {
                             <h2>{mealType}</h2>
                             {isNowServing && <span className="now-serving-badge">Now Serving</span>}
                         </div>
-                        {hasMore && (
-                            <button className="view-all-btn" onClick={() => navigate(`/category/${mealType}`)}>
-                                View All
-                            </button>
-                        )}
+                        <button className="view-all-btn" onClick={() => navigate(`/category/${mealType}`)}>
+                            View All
+                        </button>
                     </div>
                     <div className='food-display-list'>
                         {displayItems.map((item)=>{
@@ -105,6 +125,10 @@ const FoodDisplay = ({category}) => {
             ));
         })()}
         </>
+      ) : (
+        <div style={{ textAlign: 'center', padding: '50px', color: '#999' }}>
+          <p>No items found in this category.</p>
+        </div>
       )}
     </div>
   )

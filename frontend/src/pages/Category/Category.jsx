@@ -12,10 +12,10 @@ const Category = () => {
 
   // Mapping for Meal Types (Must match FoodDisplay.jsx)
   const mealMap = {
-    "Morning": ["Sandwich", "Breakfast"],
-    "Lunch": ["Salad", "Rolls", "Pure Veg", "Main Course"],
-    "Any Time Available Item": ["Pasta", "Noodles", "Pizza", "Burger"],
-    "Dessert": ["Deserts", "Cake", "Ice Cream"],
+    "Morning": ["Sandwich", "breakfast"],
+    "Lunch": ["Salad", "Rolls", "Pure Veg", "Main Course", "all"],
+    "Any Time Available Item": ["Pasta", "Noodles", "Pizza", "Burger", "dinner"],
+    "Dessert": ["Deserts", "Ice Cream", "Cake"],
     "Beverages": ["Beverages", "Drinks", "Cold Drinks"]
   };
 
