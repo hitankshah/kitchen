@@ -56,9 +56,17 @@
 
 .food-display-list{
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 30px;
     row-gap: 40px;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .food-display-list {
+        grid-template-columns: 1fr; /* Single column on tablet and mobile */
+        gap: 20px;
+    }
 }
 
 @media (max-width: 600px) {

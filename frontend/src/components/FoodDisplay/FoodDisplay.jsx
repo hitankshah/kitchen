@@ -34,10 +34,11 @@ const FoodDisplay = ({category}) => {
   // Mapping for Meal Types (must match database categories)
   const mealMap = {
     "Morning": ["Sandwich", "breakfast"],
-    "Lunch": ["Salad", "Rolls", "Pure Veg", "Main Course", "all"],
-    "Any Time Available Item": ["Pasta", "Noodles", "Pizza", "Burger", "dinner"],
-    "Dessert": ["Deserts", "Ice Cream", "Cake"],
-    "Beverages": ["Beverages", "Drinks", "Cold Drinks"]
+    "Lunch": ["Salad", "Rolls", "Pure Veg", "Main Course", "lunch"],
+    "Dinner": ["Pasta", "Noodles", "Pizza", "Burger", "dinner", "Dinner"],
+    "Dessert": ["Deserts", "Ice Cream", "Cake", "dessert"],
+    "Beverages": ["Beverages", "Drinks", "Cold Drinks", "beverages"],
+    "Anytime Items": ["Breakfast/ Anytime Items", "all"]
   };
 
   // Determine current meal time
@@ -45,11 +46,12 @@ const FoodDisplay = ({category}) => {
   let currentMeal = "";
   if (hour >= 5 && hour < 11) currentMeal = "Morning";
   else if (hour >= 11 && hour < 17) currentMeal = "Lunch";
-  else currentMeal = "Any Time Available Item"; // 5pm to 5am
+  else currentMeal = "Dinner"; // 5pm to 5am
 
   // If category is "All", show all meal sections. Otherwise show specific category.
   const isShowAllMeals = category === "All";
-  const isSpecificCategory = category !== "All" && !Object.keys(mealMap).includes(category);
+  const isSpecificMealTime = Object.keys(mealMap).includes(category);
+  const isSpecificCategory = !isShowAllMeals && !isSpecificMealTime;
 
   // Collect all categories used in mealMap
   const mappedCategories = Object.values(mealMap).flat();
@@ -67,9 +69,43 @@ const FoodDisplay = ({category}) => {
                 })}
             </div>
         </div>
-      ) : isShowAllMeals || Object.keys(mealMap).includes(category) ? (
+      ) : isSpecificMealTime ? (
+        // Show only the selected meal time section + Anytime Items
         <>
-        {/* Meal Type Sections */}
+        {Object.entries(mealMap).map(([mealType, categories]) => {
+            // Show the selected meal time and Anytime Items
+            if (mealType !== category && mealType !== "Anytime Items") return null;
+            
+            // Filter items that belong to any of the categories in this meal type
+            const mealItems = food_list.filter(item => categories.includes(item.category));
+            
+            if (mealItems.length === 0) return null;
+
+            const isNowServing = currentMeal === mealType;
+
+            return (
+                <div key={mealType} className="category-section">
+                    <div className="category-title-row">
+                        <div className="title-wrapper">
+                            <h2>{mealType}</h2>
+                            {isNowServing && <span className="now-serving-badge">Now Serving</span>}
+                        </div>
+                        <button className="view-all-btn" onClick={() => navigate(`/category/${mealType}`)}>
+                            View All
+                        </button>
+                    </div>
+                    <div className='food-display-list'>
+                        {mealItems.map((item)=>{
+                            return <FoodItem key={item.id || item._id} image={item.image_url || item.image} name={item.name} desc={item.description} price={item.price} id={item.id || item._id}/>
+                        })}
+                    </div>
+                </div>
+            )
+        })}
+        </>
+      ) : isShowAllMeals ? (
+        // Show all meal sections
+        <>
         {Object.entries(mealMap).map(([mealType, categories]) => {
             // Filter items that belong to any of the categories in this meal type
             const mealItems = food_list.filter(item => categories.includes(item.category));
@@ -77,7 +113,6 @@ const FoodDisplay = ({category}) => {
             if (mealItems.length === 0) return null;
 
             const displayItems = mealItems.slice(0, 6);
-            const hasMore = mealItems.length > 6;
             const isNowServing = currentMeal === mealType;
 
             return (
