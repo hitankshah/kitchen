@@ -263,6 +263,7 @@ const LoginPopup = ({ setShowLogin }) => {
                                 value={data.phone} 
                                 type="tel" 
                                 placeholder='Phone number' 
+                                inputMode="numeric"
                                 required 
                             />
                         </>
