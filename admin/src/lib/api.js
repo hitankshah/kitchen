@@ -9,8 +9,12 @@ export const menuItemApi = {
     console.log('User:', session?.data?.session?.user?.email);
     
     const { data, error } = await supabase
-      .from("menu_items")
-      .select("*")
+      .from("items")
+      .select(`
+        *,
+        menu_item_images(image_url, image_order),
+        categories(name)
+      `)
       .order("created_at", { ascending: false });
     
     if (error) {
@@ -24,23 +28,38 @@ export const menuItemApi = {
       throw error;
     }
     
-    console.log('✅ Menu items fetched:', data?.length || 0, 'items');
-    return data || [];
+    // Format data to match old structure
+    const formattedData = data?.map(item => ({
+      ...item,
+      image_url: item.menu_item_images?.[0]?.image_url || '',
+      category: item.categories?.name || ''
+    })) || [];
+    
+    console.log('✅ Menu items fetched:', formattedData?.length || 0, 'items');
+    return formattedData;
   },
 
   getMenuItem: async (itemId) => {
     const { data, error } = await supabase
-      .from("menu_items")
-      .select("*")
+      .from("items")
+      .select(`
+        *,
+        menu_item_images(image_url, image_order),
+        categories(name)
+      `)
       .eq("id", itemId)
       .single();
     if (error) throw error;
-    return data;
+    return {
+      ...data,
+      image_url: data.menu_item_images?.[0]?.image_url || '',
+      category: data.categories?.name || ''
+    };
   },
 
   createMenuItem: async (item) => {
     const { data, error } = await supabase
-      .from("menu_items")
+      .from("items")
       .insert(item)
       .select();
     if (error) throw error;
@@ -49,7 +68,7 @@ export const menuItemApi = {
 
   updateMenuItem: async (itemId, item) => {
     const { data, error } = await supabase
-      .from("menu_items")
+      .from("items")
       .update(item)
       .eq("id", itemId)
       .select();
@@ -64,48 +83,27 @@ export const menuItemApi = {
       throw new Error('Item ID is required for deletion');
     }
 
-    // First check if item exists
-    const { data: existingItem, error: fetchError } = await supabase
-      .from("menu_items")
-      .select("*")
-      .eq("id", itemId)
-      .single();
+    // Get images before deleting (cascade will delete them)
+    const { data: images } = await supabase
+      .from("menu_item_images")
+      .select("image_url")
+      .eq("menu_item_id", itemId);
     
-    if (fetchError) {
-      console.error('Error checking if item exists:', fetchError);
-      throw new Error(`Item not found: ${fetchError.message}`);
-    }
-    
-    console.log('Found item to delete:', existingItem);
+    console.log('Found images to delete:', images);
 
-    // Try delete with explicit return
-    const { data, error, count } = await supabase
-      .from("menu_items")
+    // Delete from database (cascade will delete images)
+    const { error: deleteError } = await supabase
+      .from("items")
       .delete()
-      .eq("id", itemId)
-      .select();
+      .eq("id", itemId);
     
-    if (error) {
-      console.error('Supabase delete error:', error);
-      throw new Error(`Delete failed: ${error.message}`);
+    if (deleteError) {
+      console.error('Error deleting item:', deleteError);
+      throw new Error(`Failed to delete: ${deleteError.message}`);
     }
     
-    console.log('Delete response - data:', data, 'count:', count);
-    
-    // Verify deletion
-    const { data: checkDeleted, error: checkError } = await supabase
-      .from("menu_items")
-      .select("id")
-      .eq("id", itemId)
-      .maybeSingle();
-    
-    if (checkDeleted) {
-      console.error('WARNING: Item still exists after delete!', checkDeleted);
-      throw new Error('Item was not deleted from database');
-    }
-    
-    console.log('Verified: Item successfully deleted from database');
-    return { success: true, deletedItem: data?.[0] };
+    console.log('Item deleted successfully');
+    return { success: true };
   },
 };
 
@@ -118,7 +116,10 @@ export const orderApi = {
     
     const { data, error } = await supabase
       .from("orders")
-      .select("*")
+      .select(`
+        *,
+        order_items(*)
+      `)
       .order("created_at", { ascending: false });
     
     if (error) {
@@ -168,7 +169,7 @@ export const orderApi = {
   updateOrderStatus: async (orderId, status) => {
     const { data, error } = await supabase
       .from("orders")
-      .update({ status, updated_at: new Date().toISOString() })
+      .update({ order_status: status, updated_at: new Date().toISOString() })
       .eq("id", orderId)
       .select();
     if (error) throw error;

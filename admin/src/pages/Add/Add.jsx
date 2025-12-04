@@ -3,7 +3,7 @@ import './Add.css'
 import { assets } from '../../assets/assets';
 import { toast } from 'react-toastify';
 import { menuItemApi, categoryApi } from '../../lib/api';
-import { uploadFile } from '../../lib/supabase';
+import { uploadFile, supabase } from '../../lib/supabase';
 
 const Add = () => {
     const [image, setImage] = useState(false);
@@ -50,18 +50,34 @@ const Add = () => {
             const imagePath = `menu-items/${timestamp}-${image.name}`;
             const imageUrl = await uploadFile(image, imagePath);
 
+            // Get category_id from category name
+            const category = categories.find(c => c.name === data.category);
+            if (!category) {
+                throw new Error('Invalid category selected');
+            }
+
             // Create menu item in Supabase
             const menuItem = {
                 name: data.name,
                 description: data.description,
                 price: Number(data.price),
-                category: data.category,
-                image_url: imageUrl,
-                is_available: true,
-                is_vegetarian: false
+                category_id: category.id,
+                is_vegetarian: false,
+                is_anytime_available: false
             };
 
-            await menuItemApi.createMenuItem(menuItem);
+            const createdItem = await menuItemApi.createMenuItem(menuItem);
+            
+            // Add image to menu_item_images table
+            const { error: imageError } = await supabase
+                .from('menu_item_images')
+                .insert({
+                    menu_item_id: createdItem.id,
+                    image_url: imageUrl,
+                    image_order: 0
+                });
+
+            if (imageError) throw imageError;
             
             toast.success('Menu item added successfully!');
             setData({
