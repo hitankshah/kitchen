@@ -31,138 +31,75 @@ const FoodDisplay = ({category}) => {
     );
   }
 
-  // Mapping for Meal Types (must match database categories)
-  const mealMap = {
-    "Morning": ["Sandwich", "breakfast"],
-    "Lunch": ["Salad", "Rolls", "Pure Veg", "Main Course", "lunch"],
-    "Dinner": ["Pasta", "Noodles", "Pizza", "Burger", "dinner", "Dinner"],
-    "Dessert": ["Deserts", "Ice Cream", "Cake", "dessert"],
-    "Beverages": ["Beverages", "Drinks", "Cold Drinks", "beverages"],
-    "Anytime Items": ["Breakfast/ Anytime Items", "all"]
-  };
-
-  // Determine current meal time
-  const hour = new Date().getHours();
-  let currentMeal = "";
-  if (hour >= 5 && hour < 11) currentMeal = "Morning";
-  else if (hour >= 11 && hour < 17) currentMeal = "Lunch";
-  else currentMeal = "Dinner"; // 5pm to 5am
-
-  // If category is "All", show all meal sections. Otherwise show specific category.
-  const isShowAllMeals = category === "All";
-  const isSpecificMealTime = Object.keys(mealMap).includes(category);
-  const isSpecificCategory = !isShowAllMeals && !isSpecificMealTime;
-
-  // Collect all categories used in mealMap
-  const mappedCategories = Object.values(mealMap).flat();
-
   return (
     <div className='food-display' id='food-display'>
-      
-      {isSpecificCategory ? (
-        // Single specific category view
-        <div className="category-section">
-            <h2>{category}</h2>
-            <div className='food-display-list'>
-                {food_list.filter(item => item.category === category).map((item)=>{
-                    return <FoodItem key={item.id || item._id} image={item.image_url || item.image} name={item.name} desc={item.description} price={item.price} id={item.id || item._id}/>
-                })}
-            </div>
-        </div>
-      ) : isSpecificMealTime ? (
-        // Show only the selected meal time section + Anytime Items
+      {category === "All" ? (
         <>
-        {Object.entries(mealMap).map(([mealType, categories]) => {
-            // Show the selected meal time and Anytime Items
-            if (mealType !== category && mealType !== "Anytime Items") return null;
+          {/* Group items by category and display each category section */}
+          {(() => {
+            // Get unique categories from food_list
+            const categories = [...new Set(food_list.map(item => item.category))].filter(Boolean);
             
-            // Filter items that belong to any of the categories in this meal type
-            const mealItems = food_list.filter(item => categories.includes(item.category));
-            
-            if (mealItems.length === 0) return null;
-
-            const isNowServing = currentMeal === mealType;
-
-            return (
-                <div key={mealType} className="category-section">
-                    <div className="category-title-row">
-                        <div className="title-wrapper">
-                            <h2>{mealType}</h2>
-                            {isNowServing && <span className="now-serving-badge">Now Serving</span>}
-                        </div>
-                        <button className="view-all-btn" onClick={() => navigate(`/category/${mealType}`)}>
-                            View All
-                        </button>
-                    </div>
-                    <div className='food-display-list'>
-                        {mealItems.map((item)=>{
-                            return <FoodItem key={item.id || item._id} image={item.image_url || item.image} name={item.name} desc={item.description} price={item.price} id={item.id || item._id}/>
-                        })}
-                    </div>
-                </div>
-            )
-        })}
-        </>
-      ) : isShowAllMeals ? (
-        // Show all meal sections
-        <>
-        {Object.entries(mealMap).map(([mealType, categories]) => {
-            // Filter items that belong to any of the categories in this meal type
-            const mealItems = food_list.filter(item => categories.includes(item.category));
-            
-            if (mealItems.length === 0) return null;
-
-            const displayItems = mealItems.slice(0, 6);
-            const isNowServing = currentMeal === mealType;
-
-            return (
-                <div key={mealType} className="category-section">
-                    <div className="category-title-row">
-                        <div className="title-wrapper">
-                            <h2>{mealType}</h2>
-                            {isNowServing && <span className="now-serving-badge">Now Serving</span>}
-                        </div>
-                        <button className="view-all-btn" onClick={() => navigate(`/category/${mealType}`)}>
-                            View All
-                        </button>
-                    </div>
-                    <div className='food-display-list'>
-                        {displayItems.map((item)=>{
-                            return <FoodItem key={item.id || item._id} image={item.image_url || item.image} name={item.name} desc={item.description} price={item.price} id={item.id || item._id}/>
-                        })}
-                    </div>
-                </div>
-            )
-        })}
-
-        {/* Other Categories Section */}
-        {(() => {
-            const otherItems = food_list.filter(item => !mappedCategories.includes(item.category));
-            if (otherItems.length === 0) return null;
-            
-            // Group by category
-            const otherCategories = [...new Set(otherItems.map(item => item.category))];
-            
-            return otherCategories.map(cat => (
+            return categories.map(cat => {
+              const categoryItems = food_list.filter(item => item.category === cat);
+              const displayItems = categoryItems.slice(0, 6);
+              const hasMore = categoryItems.length > 6;
+              
+              return (
                 <div key={cat} className="category-section">
-                    <div className="category-title-row">
-                        <h2>{cat}</h2>
-                        <button className="view-all-btn" onClick={() => navigate(`/category/${cat}`)}>
-                            View All
-                        </button>
-                    </div>
-                    <div className='food-display-list'>
-                        {otherItems.filter(item => item.category === cat).slice(0, 6).map((item)=>{
-                            return <FoodItem key={item.id || item._id} image={item.image_url || item.image} name={item.name} desc={item.description} price={item.price} id={item.id || item._id}/>
-                        })}
-                    </div>
+                  <div className="category-title-row">
+                    <h2>{cat}</h2>
+                    {hasMore && (
+                      <button className="view-all-btn" onClick={() => navigate(`/category/${cat}`)}>
+                        View All
+                      </button>
+                    )}
+                  </div>
+                  <div className='food-display-list'>
+                    {displayItems.map((item) => {
+                      return <FoodItem 
+                        key={item.id || item._id} 
+                        image={item.image_url || item.image} 
+                        name={item.name} 
+                        desc={item.description} 
+                        price={item.price} 
+                        id={item.id || item._id}
+                      />
+                    })}
+                  </div>
                 </div>
-            ));
-        })()}
+              );
+            });
+          })()}
         </>
       ) : (
-        <div style={{ textAlign: 'center', padding: '50px', color: '#999' }}>
-          <p>No items found in this category.</p>
+        // Show specific category
+        <div className="category-section">
+          <h2>{category}</h2>
+          <div className='food-display-list'>
+            {(() => {
+              const filteredItems = food_list.filter(item => item.category === category);
+              
+              if (filteredItems.length === 0) {
+                return (
+                  <p style={{ textAlign: 'center', padding: '20px', color: '#999' }}>
+                    No items found in this category.
+                  </p>
+                );
+              }
+              
+              return filteredItems.map((item) => {
+                return <FoodItem 
+                  key={item.id || item._id} 
+                  image={item.image_url || item.image} 
+                  name={item.name} 
+                  desc={item.description} 
+                  price={item.price} 
+                  id={item.id || item._id}
+                />
+              });
+            })()}
+          </div>
         </div>
       )}
     </div>

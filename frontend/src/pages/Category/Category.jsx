@@ -10,26 +10,8 @@ const Category = () => {
   const { food_list } = useContext(StoreContext);
   const navigate = useNavigate();
 
-  // Mapping for Meal Types (Must match FoodDisplay.jsx)
-  const mealMap = {
-    "Morning": ["Sandwich", "breakfast"],
-    "Lunch": ["Salad", "Rolls", "Pure Veg", "Main Course", "lunch"],
-    "Dinner": ["Pasta", "Noodles", "Pizza", "Burger", "dinner", "Dinner"],
-    "Dessert": ["Deserts", "Ice Cream", "Cake", "dessert"],
-    "Beverages": ["Beverages", "Drinks", "Cold Drinks", "beverages"],
-    "Anytime Items": ["Breakfast/ Anytime Items", "all"]
-  };
-
   // Filter items for this category
-  let categoryItems = [];
-  
-  if (mealMap[categoryName]) {
-    // If it's a Meal Type (Morning, Lunch, etc.), filter by the mapped categories
-    categoryItems = food_list.filter(item => mealMap[categoryName].includes(item.category));
-  } else {
-    // Fallback for direct category names
-    categoryItems = food_list.filter(item => item.category === categoryName);
-  }
+  const categoryItems = food_list.filter(item => item.category === categoryName);
 
   return (
     <div className='category-page'>
@@ -41,7 +23,14 @@ const Category = () => {
       <div className="category-list">
         {categoryItems.length > 0 ? (
           categoryItems.map((item, index) => {
-            return <FoodItem key={index} id={item._id} name={item.name} description={item.description} price={item.price} image={item.image} />
+            return <FoodItem 
+              key={index} 
+              id={item.id || item._id} 
+              name={item.name} 
+              desc={item.description} 
+              price={item.price} 
+              image={item.image_url || item.image} 
+            />
           })
         ) : (
           <p>No items found in this category.</p>
