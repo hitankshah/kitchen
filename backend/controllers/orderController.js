@@ -14,9 +14,7 @@ const placeOrder = async (req, res) => {
             .insert({
                 user_id: req.body.userId,
                 total_amount: req.body.amount,
-                status: 'pending',
-                payment_method: req.body.paymentMethod || 'foxy',
-                payment_status: 'pending',
+                order_status: 'pending',
                 delivery_address: typeof req.body.address === 'string' 
                     ? req.body.address 
                     : `${req.body.address.street}, ${req.body.address.city}, ${req.body.address.state} ${req.body.address.zipCode}`,
@@ -33,6 +31,7 @@ const placeOrder = async (req, res) => {
         const orderItems = req.body.items.map(item => ({
             order_id: orderData.id,
             menu_item_id: item._id || item.id,
+            item_name: item.name || '',
             quantity: item.quantity,
             price: item.price
         }));
@@ -104,9 +103,7 @@ const placeOrderCod = async (req, res) => {
             .insert({
                 user_id: req.body.userId,
                 total_amount: req.body.amount,
-                status: 'confirmed',
-                payment_method: 'cod',
-                payment_status: 'pending',
+                order_status: 'confirmed',
                 delivery_address: typeof req.body.address === 'string' 
                     ? req.body.address 
                     : `${req.body.address.street}, ${req.body.address.city}, ${req.body.address.state} ${req.body.address.zipCode}`,
@@ -123,6 +120,7 @@ const placeOrderCod = async (req, res) => {
         const orderItems = req.body.items.map(item => ({
             order_id: orderData.id,
             menu_item_id: item._id || item.id,
+            item_name: item.name || '',
             quantity: item.quantity,
             price: item.price
         }));
@@ -154,10 +152,7 @@ const listOrders = async (req, res) => {
             .from('orders')
             .select(`
                 *,
-                order_items(
-                    *,
-                    menu_items(*)
-                )
+                order_items(*)
             `)
             .order('created_at', { ascending: false });
 
@@ -177,10 +172,7 @@ const userOrders = async (req, res) => {
             .from('orders')
             .select(`
                 *,
-                order_items(
-                    *,
-                    menu_items(*)
-                )
+                order_items(*)
             `)
             .eq('user_id', req.body.userId)
             .order('created_at', { ascending: false });
@@ -199,7 +191,7 @@ const updateStatus = async (req, res) => {
     try {
         const { error } = await supabase
             .from('orders')
-            .update({ status: req.body.status })
+            .update({ order_status: req.body.status })
             .eq('id', req.body.orderId);
 
         if (error) throw error;
@@ -217,7 +209,7 @@ const verifyOrder = async (req, res) => {
         if (success === "true") {
             const { error } = await supabase
                 .from('orders')
-                .update({ payment_status: 'completed' })
+                .update({ order_status: 'confirmed' })
                 .eq('id', orderId);
 
             if (error) throw error;
